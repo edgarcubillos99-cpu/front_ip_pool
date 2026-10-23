@@ -14,9 +14,14 @@ Consume los endpoints de solo lectura del dashboard con autenticación JWT.
 | `/ips`      | Pool completo con pestañas por estado, filtro por torre, búsqueda y paginación | `GET /api/v1/ips`                         |
 | `/assigned` | Histórico de asignaciones con ticket de Ubersmith y comentario            | `GET /api/v1/assigned-ips`                |
 | `/towers`   | Stock por torre (tarjetas o lista) con semáforo y filtro de stock bajo    | `GET /api/v1/towers`                      |
+| `/users`    | Usuarios y MFA (solo admin)                                               | `GET/POST /api/v1/users`                  |
 
 Los filtros viven en la URL (`/ips?status=available&torre=X&q=10.0`), así que las vistas se pueden compartir.
 El auto-refresco (Off/15s/30s/1m/5m) se elige en la cabecera y se recuerda en el navegador.
+
+**Login:** si el usuario no tiene MFA, entra con usuario y contraseña. Si tiene MFA, la API envía un código de 6 dígitos al correo y el panel pide ese código. En **Usuarios** (rol admin) se crean cuentas y se marca quién usa MFA. El usuario de `AUTH_USERNAME` del backend se crea solo al primer arranque, como admin sin MFA (sigue sirviendo a la app móvil).
+
+Para que el correo salga, el backend necesita `SMTP_HOST` (y el resto de `SMTP_*`) en su `.env`. Sin SMTP se pueden crear usuarios, pero no se les puede activar MFA.
 Si la API responde `401` o el token expira (24 h), se cierra la sesión y se vuelve a `/login`.
 
 ## Desarrollo

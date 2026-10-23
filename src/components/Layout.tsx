@@ -7,6 +7,7 @@ import {
   Network,
   RadioTower,
   RefreshCw,
+  Users,
   X,
 } from 'lucide-react'
 import { useState } from 'react'
@@ -25,6 +26,8 @@ const NAV = [
 
 export function Layout() {
   const [open, setOpen] = useState(false)
+  const session = useSession()
+  const nav = session?.role === 'admin' ? [...NAV, { to: '/users', label: 'Usuarios', icon: Users }] : NAV
 
   return (
     <div className="flex min-h-screen">
@@ -57,7 +60,7 @@ export function Layout() {
           </button>
         </div>
         <nav className="flex-1 space-y-1 p-3">
-          {NAV.map(({ to, label, icon: Icon, end }) => (
+          {nav.map(({ to, label, icon: Icon, end }) => (
             <NavLink
               key={to}
               to={to}
@@ -138,7 +141,12 @@ function Header({ onMenu }: { onMenu: () => void }) {
         </div>
 
         <div className="hidden text-right text-xs sm:block">
-          <p className="font-medium text-slate-200">{session?.username}</p>
+          <p className="font-medium text-slate-200">
+            {session?.username}
+            {session?.role === 'admin' && (
+              <span className="ml-1.5 text-[10px] font-normal text-violet-300">admin</span>
+            )}
+          </p>
           <p className="text-slate-500">
             Sesión hasta{' '}
             {session &&

@@ -2,13 +2,14 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import axios from 'axios'
 import { createBrowserRouter, RouterProvider } from 'react-router'
 import { Layout } from '@/components/Layout'
-import { ProtectedRoute } from '@/components/ProtectedRoute'
+import { AdminRoute, ProtectedRoute } from '@/components/ProtectedRoute'
 import { AssignedPage } from '@/pages/AssignedPage'
 import { DashboardPage } from '@/pages/DashboardPage'
 import { IPsPage } from '@/pages/IPsPage'
 import { LoginPage } from '@/pages/LoginPage'
 import { NotFoundPage } from '@/pages/NotFoundPage'
 import { TowersPage } from '@/pages/TowersPage'
+import { UsersPage } from '@/pages/UsersPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -37,6 +38,10 @@ const router = createBrowserRouter([
           { path: 'ips', element: <IPsPage /> },
           { path: 'assigned', element: <AssignedPage /> },
           { path: 'towers', element: <TowersPage /> },
+          {
+            element: <AdminRoute />,
+            children: [{ path: 'users', element: <UsersPage /> }],
+          },
           { path: '*', element: <NotFoundPage /> },
         ],
       },

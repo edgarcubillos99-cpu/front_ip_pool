@@ -22,8 +22,9 @@ apiClient.interceptors.request.use((req) => {
 apiClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
-    const isLogin = error.config?.url?.includes('/auth/login')
-    if (error.response?.status === 401 && !isLogin) {
+    const url = error.config?.url ?? ''
+    const isAuthFlow = /\/auth\/(login|mfa\/)/.test(url)
+    if (error.response?.status === 401 && !isAuthFlow) {
       // El ProtectedRoute reacciona al cambio de sesión y redirige a /login.
       clearSession()
     }

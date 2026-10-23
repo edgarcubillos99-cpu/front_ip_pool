@@ -7,6 +7,7 @@ import {
   fetchLatestIPs,
   fetchStats,
   fetchTowers,
+  fetchUsers,
 } from './endpoints'
 
 export const queryKeys = {
@@ -15,6 +16,7 @@ export const queryKeys = {
   ips: (p: ListIPsParams) => ['ips', p] as const,
   assigned: (p: ListAssignedParams) => ['assigned-ips', p] as const,
   latest: (limit: number) => ['ips-latest', limit] as const,
+  users: ['users'] as const,
 }
 
 export function useStats() {
@@ -45,6 +47,10 @@ export function useAssignedIPs(params: ListAssignedParams) {
     placeholderData: keepPreviousData,
     refetchInterval,
   })
+}
+
+export function useUsers() {
+  return useQuery({ queryKey: queryKeys.users, queryFn: fetchUsers })
 }
 
 export function useLatestIPs(limit = 10) {

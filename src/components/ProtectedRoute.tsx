@@ -10,3 +10,11 @@ export function ProtectedRoute() {
   }
   return <Outlet />
 }
+
+export function AdminRoute() {
+  const session = useSession()
+  if (session?.role !== 'admin') {
+    return <Navigate to="/" replace />
+  }
+  return <Outlet />
+}

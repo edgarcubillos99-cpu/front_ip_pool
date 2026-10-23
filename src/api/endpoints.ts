@@ -1,6 +1,8 @@
 import { apiClient } from './client'
 import type {
+  AppUser,
   AssignedIPView,
+  CreateUserRequest,
   IPView,
   LatestIPsResponse,
   ListAssignedParams,
@@ -10,6 +12,8 @@ import type {
   PaginatedResponse,
   StatsResponse,
   TowersResponse,
+  UpdateUserRequest,
+  UsersResponse,
 } from '@/types/api'
 
 /** Quita parámetros vacíos para no enviar `?q=&torre=` al backend. */
@@ -21,6 +25,36 @@ function clean<T extends object>(params: T): Partial<T> {
 
 export async function login(body: LoginRequest): Promise<LoginResponse> {
   const { data } = await apiClient.post<LoginResponse>('/api/v1/auth/login', body)
+  return data
+}
+
+export async function verifyMFA(mfa_token: string, code: string): Promise<LoginResponse> {
+  const { data } = await apiClient.post<LoginResponse>('/api/v1/auth/mfa/verify', { mfa_token, code })
+  return data
+}
+
+export async function resendMFA(mfa_token: string): Promise<LoginResponse> {
+  const { data } = await apiClient.post<LoginResponse>('/api/v1/auth/mfa/resend', { mfa_token })
+  return data
+}
+
+export async function fetchUsers(): Promise<UsersResponse> {
+  const { data } = await apiClient.get<UsersResponse>('/api/v1/users')
+  return data
+}
+
+export async function createUser(body: CreateUserRequest): Promise<AppUser> {
+  const { data } = await apiClient.post<AppUser>('/api/v1/users', body)
+  return data
+}
+
+export async function updateUser(id: number, body: UpdateUserRequest): Promise<AppUser> {
+  const { data } = await apiClient.patch<AppUser>(`/api/v1/users/${id}`, body)
+  return data
+}
+
+export async function deactivateUser(id: number): Promise<AppUser> {
+  const { data } = await apiClient.delete<AppUser>(`/api/v1/users/${id}`)
   return data
 }
 

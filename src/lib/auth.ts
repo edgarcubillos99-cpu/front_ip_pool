@@ -1,10 +1,12 @@
 import { useSyncExternalStore } from 'react'
+import type { UserRole } from '@/types/api'
 
 const STORAGE_KEY = 'ippool.session'
 
-interface Session {
+export interface Session {
   token: string
   username: string
+  role: UserRole
   expiresAt: number
 }
 
@@ -22,6 +24,9 @@ function read(): Session | null {
       localStorage.removeItem(STORAGE_KEY)
       return null
     }
+    if (session.role !== 'admin' && session.role !== 'operator') {
+      session.role = 'operator'
+    }
     return session
   } catch {
     return null
@@ -33,7 +38,6 @@ let current: Session | null = read()
 function scheduleExpiry() {
   clearTimeout(expiryTimer)
   if (!current) return
-  // setTimeout se desborda con valores > ~24.8 días; el token dura 24h.
   const ms = Math.min(current.expiresAt - Date.now(), 2 ** 31 - 1)
   expiryTimer = setTimeout(() => clearSession(), Math.max(ms, 0))
 }
@@ -43,8 +47,8 @@ function emit() {
   listeners.forEach((l) => l())
 }
 
-export function setSession(token: string, username: string, expiresInSeconds: number) {
-  current = { token, username, expiresAt: Date.now() + expiresInSeconds * 1000 }
+export function setSession(token: string, username: string, role: UserRole, expiresInSeconds: number) {
+  current = { token, username, role, expiresAt: Date.now() + expiresInSeconds * 1000 }
   localStorage.setItem(STORAGE_KEY, JSON.stringify(current))
   emit()
 }
@@ -66,7 +70,6 @@ function subscribe(listener: Listener) {
   return () => listeners.delete(listener)
 }
 
-// Sincroniza el cierre de sesión entre pestañas abiertas del dashboard.
 window.addEventListener('storage', (e) => {
   if (e.key !== STORAGE_KEY) return
   current = read()

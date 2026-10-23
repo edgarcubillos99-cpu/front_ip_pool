@@ -78,15 +78,64 @@ export interface StatsResponse {
   generated_at: string
 }
 
+export type UserRole = 'admin' | 'operator'
+
 export interface LoginRequest {
   username: string
   password: string
 }
 
-export interface LoginResponse {
+export interface TokenResponse {
   access_token: string
   token_type: string
   expires_in: number
+  username: string
+  role: UserRole
+}
+
+export interface MFAChallengeResponse {
+  mfa_required: true
+  mfa_token: string
+  token_type: string
+  expires_in: number
+  email_hint: string
+}
+
+export type LoginResponse = TokenResponse | MFAChallengeResponse
+
+export function isMFAChallenge(data: LoginResponse): data is MFAChallengeResponse {
+  return 'mfa_required' in data && data.mfa_required === true
+}
+
+export interface AppUser {
+  id: number
+  username: string
+  email: string
+  role: UserRole
+  mfa_enabled: boolean
+  active: boolean
+  created_at: string
+}
+
+export interface UsersResponse {
+  users: AppUser[]
+  count: number
+}
+
+export interface CreateUserRequest {
+  username: string
+  password: string
+  email?: string
+  role: UserRole
+  mfa_enabled: boolean
+}
+
+export interface UpdateUserRequest {
+  email?: string
+  role?: UserRole
+  mfa_enabled?: boolean
+  active?: boolean
+  password?: string
 }
 
 export interface ApiErrorBody {
