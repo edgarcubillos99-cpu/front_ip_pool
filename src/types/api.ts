@@ -151,3 +151,55 @@ export interface ListIPsParams {
 }
 
 export type ListAssignedParams = Omit<ListIPsParams, 'status'>
+
+export type RunKind = 'bootstrap' | 'ciclo' | 'refill'
+
+export interface RunSummary {
+  id: number
+  tipo: RunKind | string
+  dry_run: boolean
+  interfaz_requerida?: string
+  iniciado: string
+  terminado: string
+  torres_revisadas: number
+  ips_creadas: number
+  torres_con_altas: number
+  torres_sin_cambios: number
+  torres_fallidas: number
+  ips_que_ya_existian_en_router: number
+  ips_saltadas_porque_existian: number
+  ips_creadas_por_interfaz: Record<string, number>
+  fallos_por_motivo: Record<string, number>
+}
+
+export type TowerRunStatus = 'creada' | 'sin_cambios' | 'fallida' | string
+
+export interface RunTowerReport {
+  torre: string
+  ip_gestion: string
+  mapa?: string
+  estado: TowerRunStatus
+  interfaz?: string
+  ips_creadas: number
+  ips_ya_en_router: number
+  ips_saltadas_porque_existian: number
+  altas_fallidas: number
+  inserts_mysql_fallidos: number
+  disponibles_antes: number
+  ultima_en_router?: string
+  ultimo_cidr_mysql?: string
+  contador_desde?: string
+  motivo?: string
+  duracion_ms: number
+}
+
+export interface RunDetail extends RunSummary {
+  torres: RunTowerReport[]
+}
+
+export interface ListRunsParams {
+  tipo?: RunKind
+  page?: number
+  page_size?: number
+}
+

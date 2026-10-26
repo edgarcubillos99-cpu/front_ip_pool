@@ -1,4 +1,5 @@
 import {
+  Activity,
   AlertTriangle,
   CheckCircle2,
   Clock,
@@ -12,10 +13,11 @@ import {
 } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Link } from 'react-router'
-import { useLatestIPs, useStats, useTowers } from '@/api/queries'
+import { useLatestIPs, useRuns, useStats, useTowers } from '@/api/queries'
 import { StatusBadge } from '@/components/StatusBadge'
 import { Card, CardHeader, EmptyState, ErrorState, Mono, PageHeader, ProgressBar, Skeleton } from '@/components/ui'
-import { cn, formatDateTime, formatNumber, formatRelative, percent } from '@/lib/utils'
+import { cn, formatDateTime, formatNumber, formatRelative, formatSpanDuration, percent } from '@/lib/utils'
+import { RunKindBadge } from './RunsPage'
 
 export function DashboardPage() {
   const stats = useStats()
@@ -80,6 +82,7 @@ export function DashboardPage() {
       <div className="grid gap-6 xl:grid-cols-3">
         <div className="space-y-6 xl:col-span-2">
           <PoolDistribution />
+          <RecentRunsCard />
           <LowStockTowers />
         </div>
         <LatestFeed />
@@ -168,6 +171,69 @@ function PoolDistribution() {
           ))}
         </div>
       </div>
+    </Card>
+  )
+}
+
+function RecentRunsCard() {
+  const { data, isLoading, isError, error, refetch } = useRuns({ page: 1, page_size: 5 })
+  const runs = data?.items ?? []
+
+  return (
+    <Card>
+      <CardHeader
+        title="Últimas ejecuciones del worker"
+        description="Informes de bootstrap, ciclos y refills"
+        icon={<Activity className="size-4" />}
+        actions={
+          <Link to="/runs" className="text-xs font-medium text-sky-400 hover:text-sky-300">
+            Ver historial →
+          </Link>
+        }
+      />
+      {isLoading ? (
+        <div className="space-y-2 p-4">
+          {Array.from({ length: 3 }, (_, i) => (
+            <Skeleton key={i} className="h-10 w-full" />
+          ))}
+        </div>
+      ) : isError ? (
+        <ErrorState error={error} onRetry={() => refetch()} className="m-4" />
+      ) : runs.length === 0 ? (
+        <EmptyState title="Aún no hay ejecuciones registradas" />
+      ) : (
+        <ul className="divide-y divide-slate-800">
+          {runs.map((r) => (
+            <li key={r.id}>
+              <Link
+                to={`/runs?run=${r.id}`}
+                className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 hover:bg-slate-800/40"
+              >
+                <div className="flex items-center gap-3">
+                  <Mono className="text-xs font-semibold text-sky-400">#{r.id}</Mono>
+                  <RunKindBadge kind={r.tipo} dryRun={r.dry_run} />
+                  <span className="text-xs text-slate-400" title={formatDateTime(r.iniciado)}>
+                    {formatRelative(r.iniciado)} · {formatSpanDuration(r.iniciado, r.terminado)}
+                  </span>
+                </div>
+                <div className="flex items-center gap-3 text-xs tabular-nums">
+                  <span className="text-slate-400">{r.torres_revisadas} rev.</span>
+                  <span className={r.ips_creadas > 0 ? 'font-semibold text-emerald-300' : 'text-slate-500'}>
+                    +{r.ips_creadas} IPs
+                  </span>
+                  {r.torres_fallidas > 0 ? (
+                    <span className="rounded bg-red-500/15 px-1.5 py-0.5 font-semibold text-red-300 ring-1 ring-red-500/30">
+                      {r.torres_fallidas} fallidas
+                    </span>
+                  ) : (
+                    <span className="text-emerald-400/80">0 fallos</span>
+                  )}
+                </div>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
     </Card>
   )
 }

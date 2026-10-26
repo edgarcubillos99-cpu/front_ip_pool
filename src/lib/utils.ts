@@ -42,3 +42,22 @@ export function formatNumber(n: number): string {
 export function percent(part: number, total: number): number {
   return total > 0 ? Math.round((part / total) * 100) : 0
 }
+
+export function formatDurationMs(ms: number): string {
+  if (!Number.isFinite(ms) || ms < 0) return '—'
+  if (ms < 1000) return `${Math.round(ms)} ms`
+  const sec = ms / 1000
+  if (sec < 60) return `${sec.toFixed(sec < 10 ? 1 : 0)} s`
+  const min = Math.floor(sec / 60)
+  const remSec = Math.round(sec % 60)
+  return remSec > 0 ? `${min}m ${remSec}s` : `${min}m`
+}
+
+export function formatSpanDuration(startIso: string | null | undefined, endIso: string | null | undefined): string {
+  if (!startIso || !endIso) return '—'
+  const s = new Date(startIso).getTime()
+  const e = new Date(endIso).getTime()
+  if (Number.isNaN(s) || Number.isNaN(e)) return '—'
+  return formatDurationMs(Math.max(0, e - s))
+}
+

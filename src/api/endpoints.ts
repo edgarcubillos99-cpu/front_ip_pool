@@ -7,9 +7,12 @@ import type {
   LatestIPsResponse,
   ListAssignedParams,
   ListIPsParams,
+  ListRunsParams,
   LoginRequest,
   LoginResponse,
   PaginatedResponse,
+  RunDetail,
+  RunSummary,
   StatsResponse,
   TowersResponse,
   UpdateUserRequest,
@@ -90,3 +93,16 @@ export async function fetchLatestIPs(limit = 10): Promise<LatestIPsResponse> {
   })
   return data
 }
+
+export async function fetchRuns(params: ListRunsParams): Promise<PaginatedResponse<RunSummary>> {
+  const { data } = await apiClient.get<PaginatedResponse<RunSummary>>('/api/v1/runs', {
+    params: clean(params),
+  })
+  return data
+}
+
+export async function fetchRunDetail(id: number): Promise<RunDetail> {
+  const { data } = await apiClient.get<RunDetail>(`/api/v1/runs/${id}`)
+  return data
+}
+

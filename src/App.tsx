@@ -8,6 +8,7 @@ import { DashboardPage } from '@/pages/DashboardPage'
 import { IPsPage } from '@/pages/IPsPage'
 import { LoginPage } from '@/pages/LoginPage'
 import { NotFoundPage } from '@/pages/NotFoundPage'
+import { RunsPage } from '@/pages/RunsPage'
 import { TowersPage } from '@/pages/TowersPage'
 import { UsersPage } from '@/pages/UsersPage'
 
@@ -38,6 +39,7 @@ const router = createBrowserRouter([
           { path: 'ips', element: <IPsPage /> },
           { path: 'assigned', element: <AssignedPage /> },
           { path: 'towers', element: <TowersPage /> },
+          { path: 'runs', element: <RunsPage /> },
           {
             element: <AdminRoute />,
             children: [{ path: 'users', element: <UsersPage /> }],

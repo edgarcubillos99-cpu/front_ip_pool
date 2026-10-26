@@ -1,5 +1,6 @@
 import { useIsFetching, useQueryClient } from '@tanstack/react-query'
 import {
+  Activity,
   ClipboardList,
   LayoutDashboard,
   LogOut,
@@ -22,6 +23,7 @@ const NAV = [
   { to: '/ips', label: 'Pool de IPs', icon: Network },
   { to: '/assigned', label: 'Asignaciones', icon: ClipboardList },
   { to: '/towers', label: 'Torres', icon: RadioTower },
+  { to: '/runs', label: 'Ejecuciones (Logs)', icon: Activity },
 ]
 
 export function Layout() {
